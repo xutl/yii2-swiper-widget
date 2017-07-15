@@ -18,11 +18,11 @@ class SwiperAsset extends AssetBundle
     public $sourcePath = '@vendor/xutl/yii2-swiper-widget/assets';
 
     public $js = [
-        'swiper.jquery.min.js',
+        'js/swiper.jquery.min.js',
     ];
 
     public $css = [
-        'swiper.min.css',
+        'css/swiper.min.css',
     ];
 
     public $depends = [

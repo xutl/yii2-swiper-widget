@@ -11,6 +11,7 @@ use yii\base\Widget;
 use yii\helpers\Json;
 use yii\helpers\Html;
 use yii\base\InvalidConfigException;
+use yii\helpers\Url;
 use yii\web\View;
 
 /**
@@ -23,9 +24,7 @@ class Swiper extends Widget
      * @var array the HTML attributes for the input tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
-    public $options = [
-        'class' => 'swiper-container',
-    ];
+    public $options = [];
 
     /**
      * @var array
@@ -35,13 +34,14 @@ class Swiper extends Widget
     /**
      * @var array
      */
-    public $items = [];
+    public $wrapperOptions = [];
+
+    public $paginationOptions = [];
 
     /**
-     * @var array the HTML attributes for the input tag.
-     * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
+     * @var array
      */
-    public $itemOptions = [];
+    public $items = [];
 
     /**
      * Initializes the widget.
@@ -49,8 +49,46 @@ class Swiper extends Widget
     public function init()
     {
         parent::init();
+        Html::addCssClass($this->options, 'swiper-container');
+        Html::addCssClass($this->wrapperOptions, 'swiper-wrapper');
+        Html::addCssClass($this->paginationOptions, 'swiper-pagination');
+    }
+
+    /**
+     * Renders the widget.
+     */
+    public function run()
+    {
         $this->initOptions();
         $this->registerAssets();
+        return Html::tag('div', $this->renderItems() . $this->renderPagination(), $this->options);
+    }
+
+    /**
+     * @return string the rendering result.
+     */
+    protected function renderItems()
+    {
+        $items = [];
+        foreach ($this->items as $item) {
+            if (is_array($item)) {
+                $items[] = Html::tag('div',
+                    Html::a(
+                        Html::img($item['img'], ['width' => '100%']),
+                        Url::to($item['url'])
+                    ),
+                    ['class' => 'swiper-slide']
+                );
+            } else {
+                $items[] = $item;
+            }
+        }
+        return Html::tag('div', implode("\n", $items), $this->wrapperOptions);
+    }
+
+    protected function renderPagination()
+    {
+        return Html::tag('div', '', $this->paginationOptions);
     }
 
     /**
@@ -62,7 +100,7 @@ class Swiper extends Widget
             $this->options['id'] = 'swiper_' . $this->getId();
         }
         $this->clientOptions = array_merge([
-            'pagination' => 'swiper-pagination',
+            'pagination' => '.swiper-pagination',
             'autoplay' => 3000,
             'speed' => 400,
             'autoplayDisableOnInteraction' => false,
@@ -76,14 +114,9 @@ class Swiper extends Widget
     {
         $view = $this->getView();
         SwiperAsset::register($view);
-
-
-        echo Html::tag('div', '', $this->options);
-
-
         if (!empty($this->clientOptions)) {
             $clientOptions = Json::encode($this->clientOptions);
-            $view->registerJs("var {$this->options['id']} = new Swiper('.{$this->options['id']}', {$clientOptions});");
+            $view->registerJs("var {$this->options['id']} = new Swiper('.swiper-container', {$clientOptions});");
         }
     }
 }
