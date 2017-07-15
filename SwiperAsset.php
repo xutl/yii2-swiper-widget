@@ -13,7 +13,7 @@ use yii\web\AssetBundle;
  * Class SwiperAsset
  * @package xutl\swiper
  */
-class SummerNoteAsset extends AssetBundle
+class SwiperAsset extends AssetBundle
 {
     public $sourcePath = '@vendor/xutl/yii2-swiper-widget/assets';
 
